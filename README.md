@@ -21,7 +21,7 @@ Rails, Docker Compose, o un semplice `index.html` statico).
 ## Requisiti
 
 - Node.js 18+
-- Dopo `npm install` in `mcp-server/`, esegui `npx playwright install chromium`
+- `npm install` in `mcp-server/` compila automaticamente il progetto (script `prepare`); dopo, esegui `npx playwright install chromium`
 
 ## Come funziona
 
