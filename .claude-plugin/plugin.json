@@ -1,0 +1,16 @@
+{
+  "name": "eyes",
+  "description": "Apre e analizza visivamente siti e app web: naviga, interagisce e segnala bug di layout, problemi di accessibilità ed errori console/rete.",
+  "version": "0.1.0",
+  "author": {
+    "name": "gerefloc45",
+    "email": "gerefloc45@gmail.com"
+  },
+  "skills": ["./skills/eyes"],
+  "mcpServers": {
+    "eyes": {
+      "command": "node",
+      "args": ["./mcp-server/dist/index.js"]
+    }
+  }
+}
