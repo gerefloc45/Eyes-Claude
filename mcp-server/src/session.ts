@@ -24,7 +24,13 @@ class EyesSession {
         if (this.detectedStack === "docker-compose" && this.appCwd) {
           execSync("docker compose down", { cwd: this.appCwd });
         } else {
-          this.appProcess.kill();
+          // On Windows, use taskkill with /t flag to kill the process tree (including grandchildren).
+          // On other platforms, use the standard kill() method.
+          if (process.platform === "win32" && this.appProcess.pid) {
+            execSync(`taskkill /pid ${this.appProcess.pid} /t /f`);
+          } else {
+            this.appProcess.kill();
+          }
         }
       }
     } catch (error) {
