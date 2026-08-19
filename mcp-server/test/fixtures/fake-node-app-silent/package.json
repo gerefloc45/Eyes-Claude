@@ -1,0 +1,7 @@
+{
+  "name": "fake-node-app-silent",
+  "private": true,
+  "scripts": {
+    "dev": "node server.js"
+  }
+}

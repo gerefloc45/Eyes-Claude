@@ -1,11 +1,15 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { startApp } from "../../src/tools/startApp.js";
+import { EventEmitter } from "node:events";
+import type { ChildProcess } from "node:child_process";
+import { startApp, waitForStartupUrl } from "../../src/tools/startApp.js";
 import { getSession, resetSessionForTests } from "../../src/session.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixtureDir = join(here, "..", "fixtures", "fake-node-app");
+const silentFixtureDir = join(here, "..", "fixtures", "fake-node-app-silent");
+const SILENT_FIXTURE_PORT = 47813;
 
 afterEach(async () => {
   await getSession().teardown();
@@ -37,5 +41,47 @@ describe("startApp", () => {
 
   it("throws a clear error when nothing can be detected", async () => {
     await expect(startApp({ cwd: here, timeoutMs: 2000 })).rejects.toThrow(/impossibile rilevare/);
+  });
+
+  it("kills the spawned process tree on timeout instead of leaking it (finding 1)", async () => {
+    // fake-node-app-silent listens on a fixed port but never prints a
+    // "Local: http://..." line, so parseStartupUrl never matches and the
+    // wait always times out. Crucially, because the timeout fires before
+    // startApp ever reaches `session.appProcess = child`, the session's
+    // teardown() (called in afterEach) has nothing to clean up here -- if
+    // waitForStartupUrl's timeout branch didn't kill the child itself, this
+    // process would leak permanently and keep answering on its port.
+    await expect(startApp({ cwd: silentFixtureDir, timeoutMs: 2000 })).rejects.toThrow(
+      /timeout.*attesa/i
+    );
+
+    // Give the OS a brief moment to finish tearing down the killed process
+    // tree before we probe the port it was listening on.
+    await new Promise((r) => setTimeout(r, 500));
+
+    await expect(
+      fetch(`http://localhost:${SILENT_FIXTURE_PORT}`, { signal: AbortSignal.timeout(1000) })
+    ).rejects.toThrow();
+  }, 15000);
+
+  it("rejects (not throws) when the spawned child emits a spawn-level 'error' event (finding 2)", async () => {
+    // Simulates the failure mode Node produces when spawn() fails
+    // asynchronously (e.g. EACCES) -- an unhandled 'error' event on the
+    // ChildProcess, which without a listener would crash the process
+    // instead of surfacing as a promise rejection. Tested in isolation
+    // against waitForStartupUrl directly, since shell:true masks a real
+    // ENOENT (the shell itself still launches fine).
+    const fakeChild = new EventEmitter() as unknown as ChildProcess;
+    Object.assign(fakeChild, {
+      stdout: new EventEmitter(),
+      stderr: new EventEmitter(),
+      killed: false,
+      pid: 999999,
+    });
+
+    const promise = waitForStartupUrl(fakeChild, 5000);
+    fakeChild.emit("error", new Error("spawn ENOENT"));
+
+    await expect(promise).rejects.toThrow(/spawn ENOENT/);
   });
 });
