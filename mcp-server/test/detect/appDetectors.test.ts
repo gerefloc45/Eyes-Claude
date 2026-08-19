@@ -72,4 +72,14 @@ describe("detectStartCommand", () => {
     writeFileSync(join(dir, "index.html"), "<html></html>");
     expect(detectStartCommand(dir)).toEqual({ command: "npx", args: ["serve", "."], stack: "static" });
   });
+
+  it("gracefully handles malformed package.json and falls through to next heuristic", () => {
+    writeFileSync(join(dir, "package.json"), "{ invalid json");
+    writeFileSync(join(dir, "manage.py"), "");
+    expect(detectStartCommand(dir)).toEqual({
+      command: "python",
+      args: ["manage.py", "runserver"],
+      stack: "django",
+    });
+  });
 });

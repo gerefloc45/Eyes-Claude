@@ -14,12 +14,16 @@ export function detectStartCommand(cwd: string): StartCommand | null {
 
   const packageJsonPath = join(cwd, "package.json");
   if (existsSync(packageJsonPath)) {
-    const pkg = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-    const scripts: Record<string, string> = pkg.scripts ?? {};
-    for (const scriptName of ["dev", "start", "serve"]) {
-      if (scripts[scriptName]) {
-        return { command: "npm", args: ["run", scriptName], stack: `node:${scriptName}` };
+    try {
+      const pkg = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
+      const scripts: Record<string, string> = pkg.scripts ?? {};
+      for (const scriptName of ["dev", "start", "serve"]) {
+        if (scripts[scriptName]) {
+          return { command: "npm", args: ["run", scriptName], stack: `node:${scriptName}` };
+        }
       }
+    } catch {
+      // Malformed JSON, skip this heuristic and continue to the next
     }
   }
 
