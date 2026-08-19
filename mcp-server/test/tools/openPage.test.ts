@@ -51,6 +51,6 @@ describe("openPage", () => {
   });
 
   it("rejects with a clear error instead of hanging or throwing a raw Playwright error on an unreachable URL", async () => {
-    await expect(openPage({ url: "http://localhost:1/" })).rejects.toThrow(/Eyes:.*navigazione.*localhost:1/);
+    await expect(openPage({ url: "http://localhost:1/" })).rejects.toThrow(/Eyes:.*navigation.*localhost:1/);
   }, 10000);
 });

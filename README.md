@@ -1,53 +1,52 @@
 # Eyes
 
-Plugin Claude Code che dà a Claude una vista visiva "da utente" su
-qualsiasi sito o app web che stai sviluppando: la avvia (o si collega a
-un URL già attivo), la naviga e ci interagisce come farebbe una
-persona, e produce un report dei bug trovati — layout rotto,
-accessibilità, errori console/rete.
+Claude Code plugin that gives Claude a "real user's" visual view of any
+site or web app you're developing: it starts it (or connects to an
+already-running URL), navigates and interacts with it like a person
+would, and produces a report of the bugs it finds — broken layout,
+accessibility issues, console/network errors.
 
-## Uso
+## Usage
 
 ```
 /eyes <url>
-/eyes <path-al-progetto>
+/eyes <path-to-project>
 /eyes
 ```
 
-Senza argomenti, Eyes usa la working directory corrente e prova a
-rilevare come avviare il progetto (Node.js, Django, Flask, FastAPI,
-Rails, o un semplice `index.html` statico). I progetti Docker Compose
-non sono ancora supportati automaticamente in v1 — vedi "Limitazioni
-note".
+With no arguments, Eyes uses the current working directory and tries to
+detect how to start the project (Node.js, Django, Flask, FastAPI,
+Rails, or a plain static `index.html`). Docker Compose projects aren't
+automatically supported yet in v1 — see "Known limitations".
 
-## Requisiti
+## Requirements
 
 - Node.js 18+
-- `npm install` in `mcp-server/` compila automaticamente il progetto (script `prepare`); dopo, esegui `npx playwright install chromium`
+- `npm install` in `mcp-server/` builds the project automatically (`prepare` script); afterward, run `npx playwright install chromium`
 
-## Come funziona
+## How it works
 
-- Un server MCP (`mcp-server/`) espone i tool `start_app`, `open_page`,
-  `screenshot`, `click`, `fill`, `stop_app`, basati su Playwright.
-- La skill `/eyes` (`skills/eyes/SKILL.md`) istruisce Claude a guidare
-  l'esplorazione passo passo: osserva screenshot e dati automatici
-  (errori console/rete, audit di accessibilità con axe-core, controlli
-  di overflow/contrasto), decide quali link/bottoni esplorare, e
-  compone un report finale.
+- An MCP server (`mcp-server/`) exposes the tools `start_app`, `open_page`,
+  `screenshot`, `click`, `fill`, `stop_app`, built on Playwright.
+- The `/eyes` skill (`skills/eyes/SKILL.md`) instructs Claude to drive
+  the exploration step by step: look at the screenshot and automated
+  data (console/network errors, accessibility audit via axe-core,
+  overflow/contrast checks), decide which links/buttons to explore, and
+  compose a final report.
 
-## Limitazioni note
+## Known limitations
 
-- Guardrail di sicurezza bloccano click su elementi che sembrano
-  distruttivi (es. "Elimina account", pagamenti), link verso domini
-  esterni, e l'inserimento di credenziali reali in form di
-  login/signup — vedi `docs/superpowers/specs/2026-08-19-eyes-plugin-design.md`.
-- Budget di default: massimo 8 pagine e 15 interazioni per run.
-- Nessun bypass dei guardrail nella v1.
-- Progetti Docker Compose: la rilevazione fallisce subito con un errore
-  chiaro invece di avviarli — usa il parametro `url` per puntare
-  direttamente all'app già avviata manualmente.
+- Safety guardrails block clicks on elements that look destructive
+  (e.g. "Delete account", payments), links to external domains, and
+  entering real credentials into login/signup forms — see
+  `docs/superpowers/specs/2026-08-19-eyes-plugin-design.md`.
+- Default budget: at most 8 pages and 15 interactions per run.
+- No guardrail bypass in v1.
+- Docker Compose projects: detection fails immediately with a clear
+  error instead of starting them — use the `url` parameter to point
+  directly at an app you've already started manually.
 
-## Sviluppo
+## Development
 
 ```
 cd mcp-server

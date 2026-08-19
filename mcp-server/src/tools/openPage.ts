@@ -59,7 +59,7 @@ export async function openPage(options: OpenPageOptions): Promise<OpenPageResult
     await page.goto(options.url, { waitUntil: "load" });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`Eyes: navigazione a ${options.url} fallita: ${message}`);
+    throw new Error(`Eyes: navigation to ${options.url} failed: ${message}`);
   }
 
   const screenshotBuffer = await page.screenshot();

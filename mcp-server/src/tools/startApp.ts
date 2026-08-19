@@ -24,13 +24,13 @@ export async function startApp(options: StartAppOptions): Promise<StartAppResult
   const detection = detectStartCommand(cwd);
   if (!detection) {
     throw new Error(
-      `Eyes: impossibile rilevare come avviare il progetto in ${cwd}. Specifica un URL esplicito con il parametro "url".`
+      `Eyes: could not detect how to start the project in ${cwd}. Specify an explicit URL with the "url" parameter.`
     );
   }
 
   if (detection.stack === "docker-compose") {
     throw new Error(
-      `Eyes: i progetti Docker Compose non sono ancora supportati automaticamente. Avvia l'app manualmente e richiama /eyes con il parametro "url".`
+      `Eyes: Docker Compose projects aren't automatically supported yet. Start the app manually and call /eyes with the "url" parameter.`
     );
   }
 
@@ -56,7 +56,7 @@ export function waitForStartupUrl(child: ChildProcess, timeoutMs: number): Promi
     const timer = setTimeout(() => {
       cleanup();
       killOrphanedChild();
-      reject(new Error(`Eyes: timeout (${timeoutMs}ms) in attesa che l'app stampasse un URL di avvio`));
+      reject(new Error(`Eyes: timeout (${timeoutMs}ms) waiting for the app to print a startup URL`));
     }, timeoutMs);
 
     function onData(chunk: Buffer) {
@@ -79,8 +79,8 @@ export function waitForStartupUrl(child: ChildProcess, timeoutMs: number): Promi
     function onExit(code: number | null) {
       cleanup();
       const trimmed = buffer.trim();
-      const output = trimmed ? `\n${trimmed}` : " (nessun output)";
-      reject(new Error(`Eyes: il processo dell'app è terminato (codice ${code}) prima di stampare un URL:${output}`));
+      const output = trimmed ? `\n${trimmed}` : " (no output)";
+      reject(new Error(`Eyes: the app process exited (code ${code}) before printing a URL:${output}`));
     }
 
     function cleanup() {

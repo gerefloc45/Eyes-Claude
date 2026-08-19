@@ -13,7 +13,7 @@ export interface InteractResult {
 }
 
 const SELECTOR_NOT_FOUND_REASON =
-  "selettore non trovato — la pagina potrebbe essere cambiata, richiama open_page per rigenerare i selettori";
+  "selector not found — the page may have changed, call open_page again to regenerate the selectors";
 
 export async function clickElement(options: InteractOptions): Promise<InteractResult> {
   const session = getSession();

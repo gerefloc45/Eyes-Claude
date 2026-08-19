@@ -43,7 +43,7 @@ describe("startApp", () => {
   });
 
   it("throws a clear error when nothing can be detected", async () => {
-    await expect(startApp({ cwd: here, timeoutMs: 2000 })).rejects.toThrow(/impossibile rilevare/);
+    await expect(startApp({ cwd: here, timeoutMs: 2000 })).rejects.toThrow(/could not detect/);
   });
 
   it("kills the spawned process tree on timeout instead of leaking it (finding 1)", async () => {
@@ -55,7 +55,7 @@ describe("startApp", () => {
     // waitForStartupUrl's timeout branch didn't kill the child itself, this
     // process would leak permanently and keep answering on its port.
     await expect(startApp({ cwd: silentFixtureDir, timeoutMs: 2000 })).rejects.toThrow(
-      /timeout.*attesa/i
+      /timeout.*waiting/i
     );
 
     // Give the OS a brief moment to finish tearing down the killed process
@@ -108,7 +108,7 @@ describe("startApp", () => {
     const elapsed = Date.now() - start;
 
     expect(caught).not.toBeNull();
-    expect(caught!.message).toMatch(/terminato|exit|codice/i);
+    expect(caught!.message).toMatch(/exited|exit|code/i);
     expect(caught!.message).not.toMatch(/timeout/i);
     expect(elapsed).toBeLessThan(10000);
   }, 15000);

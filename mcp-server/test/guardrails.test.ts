@@ -4,7 +4,7 @@ import { checkGuardrail, type ElementDescriptor } from "../src/guardrails.js";
 function baseEl(overrides: Partial<ElementDescriptor> = {}): ElementDescriptor {
   return {
     tagName: "button",
-    text: "Salva",
+    text: "Save",
     currentOrigin: "http://localhost:3000",
     ...overrides,
   };
@@ -16,9 +16,9 @@ describe("checkGuardrail", () => {
   });
 
   it("blocks a delete button by text", () => {
-    const result = checkGuardrail(baseEl({ text: "Elimina account" }));
+    const result = checkGuardrail(baseEl({ text: "Delete account" }));
     expect(result.allowed).toBe(false);
-    expect(result.reason).toMatch(/distruttiv/);
+    expect(result.reason).toMatch(/destructive/);
   });
 
   it("blocks a pay button by aria-label", () => {
@@ -28,15 +28,15 @@ describe("checkGuardrail", () => {
 
   it("blocks a link to an external origin", () => {
     const result = checkGuardrail(
-      baseEl({ tagName: "a", text: "Visita", href: "https://external.example.com/page" })
+      baseEl({ tagName: "a", text: "Visit", href: "https://external.example.com/page" })
     );
     expect(result.allowed).toBe(false);
-    expect(result.reason).toMatch(/link esterno/);
+    expect(result.reason).toMatch(/external link/);
   });
 
   it("allows a link to the same origin", () => {
     const result = checkGuardrail(
-      baseEl({ tagName: "a", text: "Prodotti", href: "http://localhost:3000/prodotti" })
+      baseEl({ tagName: "a", text: "Products", href: "http://localhost:3000/products" })
     );
     expect(result.allowed).toBe(true);
   });

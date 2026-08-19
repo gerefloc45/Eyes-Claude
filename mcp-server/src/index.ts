@@ -13,7 +13,7 @@ export function createServer(): McpServer {
 
   server.tool(
     "start_app",
-    "Avvia un'app locale rilevando automaticamente lo stack, oppure usa un URL già attivo.",
+    "Starts a local app by auto-detecting its stack, or uses an already-running URL.",
     { cwd: z.string().optional(), url: z.string().optional(), timeoutMs: z.number().optional() },
     async ({ cwd, url, timeoutMs }) => {
       const result = await startApp({ cwd, url, timeoutMs });
@@ -23,7 +23,7 @@ export function createServer(): McpServer {
 
   server.tool(
     "open_page",
-    "Naviga a una pagina e ritorna screenshot, errori console/network, audit accessibilità e visivo, elementi interattivi.",
+    "Navigates to a page and returns a screenshot, console/network errors, accessibility and visual audits, and interactive elements.",
     { url: z.string(), viewport: z.object({ width: z.number(), height: z.number() }).optional() },
     async ({ url, viewport }) => {
       const result = await openPage({ url, viewport });
@@ -39,7 +39,7 @@ export function createServer(): McpServer {
 
   server.tool(
     "screenshot",
-    "Scatta uno screenshot della pagina corrente a un viewport specifico.",
+    "Takes a screenshot of the current page at a specific viewport.",
     { viewport: z.object({ width: z.number(), height: z.number() }) },
     async ({ viewport }) => {
       const result = await takeScreenshot({ viewport });
@@ -49,7 +49,7 @@ export function createServer(): McpServer {
 
   server.tool(
     "click",
-    "Clicca un elemento della pagina corrente; bloccato dal guardrail se sembra distruttivo.",
+    "Clicks an element on the current page; blocked by the guardrail if it looks destructive.",
     { selector: z.string() },
     async ({ selector }) => {
       const result = await clickElement({ selector });
@@ -59,7 +59,7 @@ export function createServer(): McpServer {
 
   server.tool(
     "fill",
-    "Compila un campo della pagina corrente; bloccato dal guardrail se sensibile.",
+    "Fills a field on the current page; blocked by the guardrail if it's sensitive.",
     { selector: z.string(), value: z.string() },
     async ({ selector, value }) => {
       const result = await fillElement({ selector, value });
@@ -67,7 +67,7 @@ export function createServer(): McpServer {
     }
   );
 
-  server.tool("stop_app", "Ferma l'app avviata e chiude il browser.", {}, async () => {
+  server.tool("stop_app", "Stops the started app and closes the browser.", {}, async () => {
     const result = await stopApp();
     return { content: [{ type: "text", text: JSON.stringify(result) }] };
   });

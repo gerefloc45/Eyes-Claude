@@ -19,7 +19,7 @@ describe("clickElement", () => {
 
     const result = await clickElement({ selector: "#delete-btn" });
     expect(result.performed).toBe(false);
-    expect(result.reason).toMatch(/distruttiv/);
+    expect(result.reason).toMatch(/destructive/);
   });
 
   it("blocks a click on an external link", async () => {
@@ -68,7 +68,7 @@ describe("clickElement", () => {
 
     const result = await clickElement({ selector: "#does-not-exist-anywhere" });
     expect(result.performed).toBe(false);
-    expect(result.reason).toMatch(/selettore|pagina/);
+    expect(result.reason).toMatch(/selector|page/);
   });
 });
 

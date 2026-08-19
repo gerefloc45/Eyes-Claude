@@ -24,7 +24,7 @@ export function checkGuardrail(el: ElementDescriptor): GuardrailResult {
   if (DESTRUCTIVE_PATTERN.test(label)) {
     return {
       allowed: false,
-      reason: `azione bloccata dal guardrail: "${label.trim()}" sembra un'azione distruttiva`,
+      reason: `action blocked by the guardrail: "${label.trim()}" looks like a destructive action`,
     };
   }
 
@@ -37,29 +37,29 @@ export function checkGuardrail(el: ElementDescriptor): GuardrailResult {
       if (target.origin !== current.origin) {
         return {
           allowed: false,
-          reason: `azione bloccata dal guardrail: link esterno verso ${target.origin}`,
+          reason: `action blocked by the guardrail: external link to ${target.origin}`,
         };
       }
     } catch {
-      // href relativo o non valido: consentito
+      // relative or invalid href: allowed
     }
   }
 
   if (tag === "input" && el.type === "password") {
-    return { allowed: false, reason: "azione bloccata dal guardrail: campo password" };
+    return { allowed: false, reason: "action blocked by the guardrail: password field" };
   }
 
   if (tag === "input" && el.type === "email" && el.formHasPasswordField) {
     return {
       allowed: false,
-      reason: "azione bloccata dal guardrail: campo email in un form di login/signup",
+      reason: "action blocked by the guardrail: email field in a login/signup form",
     };
   }
 
   if (el.type === "submit" && el.formHasSensitiveField) {
     return {
       allowed: false,
-      reason: "azione bloccata dal guardrail: submit di un form con campi sensibili",
+      reason: "action blocked by the guardrail: submitting a form with sensitive fields",
     };
   }
 
