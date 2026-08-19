@@ -10,18 +10,31 @@ console and network errors — instead of you having to check manually.
 ## Installation
 
 ```
-claude plugin marketplace add gerefloc45/Claude-Eyes
+claude plugin marketplace add gerefloc45/Eyes-Claude
 claude plugin install eyes@eyes
 ```
 
 Or, from inside a Claude Code session:
 
 ```
-/plugin marketplace add gerefloc45/Claude-Eyes
+/plugin marketplace add gerefloc45/Eyes-Claude
 /plugin install eyes@eyes
 ```
 
 Restart Claude Code after installing so the plugin's MCP server connects.
+The plugin ships pre-built, so no `npm install` step is needed.
+
+**One-time browser setup:** Eyes drives a real headless Chromium browser
+via Playwright. If you've never installed a Playwright browser before,
+download it once:
+
+```
+npx --yes playwright install chromium
+```
+
+If Chromium is already installed from another Playwright project, Eyes
+reuses it and you can skip this step. Without it, the first `/eyes` run
+will fail with an error asking you to run the command above.
 
 ## Usage
 
@@ -88,9 +101,8 @@ Example report output:
 ## Requirements
 
 - Node.js 18+
-- `npm install` in `mcp-server/` builds the project automatically (via
-  the `prepare` script); afterward, run `npx playwright install chromium`
-  once to download the browser Eyes drives.
+- Chromium installed via Playwright — see the one-time browser setup
+  step under [Installation](#installation).
 
 ## Known limitations
 
