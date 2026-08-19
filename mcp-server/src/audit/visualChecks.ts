@@ -39,7 +39,9 @@ export function evaluateVisualIssues(boxes: ElementBox[]): VisualIssue[] {
       issues.push({ selector: box.selector, kind: "offscreen", detail: "elemento posizionato fuori dal viewport" });
     }
   }
-  return issues;
+  // Cap the number of issues returned so the MCP tool response Claude has to
+  // read stays bounded even when many elements have problems.
+  return issues.slice(0, 50);
 }
 
 export async function collectVisualIssues(page: Page): Promise<VisualIssue[]> {
@@ -88,8 +90,7 @@ export async function collectVisualIssues(page: Page): Promise<VisualIssue[]> {
         color: style.color,
         backgroundColor: style.backgroundColor,
         contrastRatio,
-        offscreen:
-          rect.right < 0 || rect.bottom < 0 || rect.left > window.innerWidth || rect.top > window.innerHeight,
+        offscreen: rect.right < 0 || rect.left > document.documentElement.clientWidth,
       };
     });
   });

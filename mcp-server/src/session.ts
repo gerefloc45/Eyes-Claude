@@ -57,6 +57,8 @@ class EyesSession {
       this.browser = null;
     }
     this.appProcess = null;
+    this.appCwd = null;
+    this.detectedStack = null;
   }
 }
 

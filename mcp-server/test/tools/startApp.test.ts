@@ -3,12 +3,15 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { EventEmitter } from "node:events";
 import type { ChildProcess } from "node:child_process";
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { startApp, waitForStartupUrl } from "../../src/tools/startApp.js";
 import { getSession, resetSessionForTests } from "../../src/session.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixtureDir = join(here, "..", "fixtures", "fake-node-app");
 const silentFixtureDir = join(here, "..", "fixtures", "fake-node-app-silent");
+const crashFixtureDir = join(here, "..", "fixtures", "fake-node-app-crash");
 const SILENT_FIXTURE_PORT = 47813;
 
 afterEach(async () => {
@@ -84,4 +87,29 @@ describe("startApp", () => {
 
     await expect(promise).rejects.toThrow(/spawn ENOENT/);
   });
+
+  it("rejects immediately with a clear error for a Docker Compose project instead of attempting to spawn+wait", async () => {
+    const tempDir = mkdtempSync(join(tmpdir(), "eyes-compose-"));
+    writeFileSync(join(tempDir, "docker-compose.yml"), "services: {}");
+
+    const start = Date.now();
+    await expect(startApp({ cwd: tempDir, timeoutMs: 30000 })).rejects.toThrow(/Docker Compose/i);
+    expect(Date.now() - start).toBeLessThan(1000);
+  });
+
+  it("fails fast with a clear error (not a generic timeout) when the spawned app process exits immediately", async () => {
+    const start = Date.now();
+    let caught: Error | null = null;
+    try {
+      await startApp({ cwd: crashFixtureDir, timeoutMs: 30000 });
+    } catch (error) {
+      caught = error as Error;
+    }
+    const elapsed = Date.now() - start;
+
+    expect(caught).not.toBeNull();
+    expect(caught!.message).toMatch(/terminato|exit|codice/i);
+    expect(caught!.message).not.toMatch(/timeout/i);
+    expect(elapsed).toBeLessThan(10000);
+  }, 15000);
 });

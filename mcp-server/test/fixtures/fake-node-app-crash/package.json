@@ -1,0 +1,7 @@
+{
+  "name": "fake-node-app-crash",
+  "private": true,
+  "scripts": {
+    "dev": "node -e \"console.error('port 3000 already in use'); process.exit(1)\""
+  }
+}

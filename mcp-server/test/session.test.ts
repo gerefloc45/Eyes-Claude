@@ -32,6 +32,18 @@ describe("EyesSession", () => {
     expect(freshSession).not.toBe(session);
   });
 
+  it("teardown resets appCwd and detectedStack so a later run doesn't inherit stale state", async () => {
+    const session = getSession();
+    await session.getPage();
+    session.appCwd = "/some/previous/project";
+    session.detectedStack = "docker-compose";
+
+    await session.teardown();
+
+    expect(session.appCwd).toBeNull();
+    expect(session.detectedStack).toBeNull();
+  });
+
   it("teardown does not throw even if appProcess cleanup fails", async () => {
     const session = getSession();
     await session.getPage(); // Create the browser and page

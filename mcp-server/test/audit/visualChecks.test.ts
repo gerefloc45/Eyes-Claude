@@ -109,4 +109,11 @@ describe("collectVisualIssues (Playwright integration)", () => {
     const translucentIssue = issues.find((i) => i.kind === "low-contrast" && i.selector === expectedSelector);
     expect(translucentIssue).toBeUndefined();
   });
+
+  it("does not flag elements below the fold on a long page as offscreen", async () => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto(`file://${join(fixturesDir, "tall-page.html")}`);
+    const issues = await collectVisualIssues(page);
+    expect(issues.filter((i) => i.kind === "offscreen")).toEqual([]);
+  });
 });

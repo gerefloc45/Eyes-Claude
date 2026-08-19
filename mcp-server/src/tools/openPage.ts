@@ -12,9 +12,11 @@ export interface InteractiveElement {
   selector: string;
   tagName: string;
   text: string;
+  href?: string;
 }
 
 export interface OpenPageResult {
+  url: string;
   screenshotBase64: string;
   consoleMessages: { type: string; text: string }[];
   failedRequests: { url: string; status: number | null; errorText?: string }[];
@@ -53,7 +55,12 @@ export async function openPage(options: OpenPageOptions): Promise<OpenPageResult
     }
   });
 
-  await page.goto(options.url, { waitUntil: "networkidle" });
+  try {
+    await page.goto(options.url, { waitUntil: "load" });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Eyes: navigazione a ${options.url} fallita: ${message}`);
+  }
 
   const screenshotBuffer = await page.screenshot();
   const [a11yIssues, visualIssues, interactiveElements] = await Promise.all([
@@ -63,6 +70,7 @@ export async function openPage(options: OpenPageOptions): Promise<OpenPageResult
   ]);
 
   return {
+    url: page.url(),
     screenshotBase64: screenshotBuffer.toString("base64"),
     consoleMessages,
     failedRequests,
@@ -78,7 +86,8 @@ async function collectInteractiveElements(page: Page): Promise<InteractiveElemen
       el.setAttribute("data-eyes-id", String(i));
       const tagName = el.tagName.toLowerCase();
       const text = (el.textContent || (el as HTMLInputElement).value || "").trim().slice(0, 80);
-      return { selector: `[data-eyes-id="${i}"]`, tagName, text };
+      const href = el.getAttribute("href") ?? undefined;
+      return { selector: `[data-eyes-id="${i}"]`, tagName, text, href };
     })
   );
 }

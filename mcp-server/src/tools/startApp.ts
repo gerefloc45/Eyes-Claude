@@ -28,6 +28,12 @@ export async function startApp(options: StartAppOptions): Promise<StartAppResult
     );
   }
 
+  if (detection.stack === "docker-compose") {
+    throw new Error(
+      `Eyes: i progetti Docker Compose non sono ancora supportati automaticamente. Avvia l'app manualmente e richiama /eyes con il parametro "url".`
+    );
+  }
+
   const child = spawn(detection.command, detection.args, { cwd, shell: true });
   const timeoutMs = options.timeoutMs ?? 30000;
   const baseUrl = await waitForStartupUrl(child, timeoutMs);
@@ -67,11 +73,22 @@ export function waitForStartupUrl(child: ChildProcess, timeoutMs: number): Promi
       reject(err);
     }
 
+    // If the process exits before we ever found a startup URL (most commonly:
+    // the port is already in use), fail immediately with whatever output we
+    // captured instead of waiting out the full timeout for a generic message.
+    function onExit(code: number | null) {
+      cleanup();
+      const trimmed = buffer.trim();
+      const output = trimmed ? `\n${trimmed}` : " (nessun output)";
+      reject(new Error(`Eyes: il processo dell'app è terminato (codice ${code}) prima di stampare un URL:${output}`));
+    }
+
     function cleanup() {
       clearTimeout(timer);
       child.stdout?.off("data", onData);
       child.stderr?.off("data", onData);
       child.off("error", onError);
+      child.off("exit", onExit);
     }
 
     // On timeout, the caller never gets a reference to `child` (startApp only
@@ -94,5 +111,6 @@ export function waitForStartupUrl(child: ChildProcess, timeoutMs: number): Promi
     child.stdout?.on("data", onData);
     child.stderr?.on("data", onData);
     child.on("error", onError);
+    child.on("exit", onExit);
   });
 }

@@ -53,6 +53,23 @@ describe("clickElement", () => {
     const result = await clickElement({ selector: "#newsletter-submit" });
     expect(result.performed).toBe(true);
   });
+
+  it("blocks a <button> with no explicit type attribute inside a form with a password field (implicit submit)", async () => {
+    const page = await getSession().getPage();
+    await page.goto(`file://${join(fixturesDir, "login-form.html")}`);
+
+    const result = await clickElement({ selector: "#implicit-submit-btn" });
+    expect(result.performed).toBe(false);
+  });
+
+  it("returns a structured result instead of throwing when the selector no longer matches", async () => {
+    const page = await getSession().getPage();
+    await page.goto(`file://${join(fixturesDir, "login-form.html")}`);
+
+    const result = await clickElement({ selector: "#does-not-exist-anywhere" });
+    expect(result.performed).toBe(false);
+    expect(result.reason).toMatch(/selettore|pagina/);
+  });
 });
 
 describe("fillElement", () => {

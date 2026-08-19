@@ -12,10 +12,18 @@ export interface InteractResult {
   reason?: string;
 }
 
+const SELECTOR_NOT_FOUND_REASON =
+  "selettore non trovato — la pagina potrebbe essere cambiata, richiama open_page per rigenerare i selettori";
+
 export async function clickElement(options: InteractOptions): Promise<InteractResult> {
   const session = getSession();
   const page = await session.getPage();
-  const descriptor = await describeElement(page, options.selector);
+  let descriptor: ElementDescriptor;
+  try {
+    descriptor = await describeElement(page, options.selector);
+  } catch {
+    return { performed: false, reason: SELECTOR_NOT_FOUND_REASON };
+  }
   const guard = checkGuardrail(descriptor);
   if (!guard.allowed) {
     return { performed: false, reason: guard.reason };
@@ -27,7 +35,12 @@ export async function clickElement(options: InteractOptions): Promise<InteractRe
 export async function fillElement(options: InteractOptions): Promise<InteractResult> {
   const session = getSession();
   const page = await session.getPage();
-  const descriptor = await describeElement(page, options.selector);
+  let descriptor: ElementDescriptor;
+  try {
+    descriptor = await describeElement(page, options.selector);
+  } catch {
+    return { performed: false, reason: SELECTOR_NOT_FOUND_REASON };
+  }
   const guard = checkGuardrail(descriptor);
   if (!guard.allowed) {
     return { performed: false, reason: guard.reason };
@@ -47,7 +60,7 @@ async function describeElement(page: Page, selector: string): Promise<ElementDes
       name: el.getAttribute("name") ?? undefined,
       id: el.getAttribute("id") ?? undefined,
       href: el.getAttribute("href") ?? undefined,
-      type: el.getAttribute("type") ?? undefined,
+      type: (el as HTMLButtonElement | HTMLInputElement).type || el.getAttribute("type") || undefined,
       currentOrigin: window.location.origin,
       formHasPasswordField,
       formHasSensitiveField: formHasPasswordField,
