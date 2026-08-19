@@ -16,7 +16,9 @@ accessibilità, errori console/rete.
 
 Senza argomenti, Eyes usa la working directory corrente e prova a
 rilevare come avviare il progetto (Node.js, Django, Flask, FastAPI,
-Rails, Docker Compose, o un semplice `index.html` statico).
+Rails, o un semplice `index.html` statico). I progetti Docker Compose
+non sono ancora supportati automaticamente in v1 — vedi "Limitazioni
+note".
 
 ## Requisiti
 
@@ -41,6 +43,9 @@ Rails, Docker Compose, o un semplice `index.html` statico).
   login/signup — vedi `docs/superpowers/specs/2026-08-19-eyes-plugin-design.md`.
 - Budget di default: massimo 8 pagine e 15 interazioni per run.
 - Nessun bypass dei guardrail nella v1.
+- Progetti Docker Compose: la rilevazione fallisce subito con un errore
+  chiaro invece di avviarli — usa il parametro `url` per puntare
+  direttamente all'app già avviata manualmente.
 
 ## Sviluppo
 

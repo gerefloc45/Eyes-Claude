@@ -1,0 +1,14 @@
+{
+  "name": "eyes",
+  "description": "Marketplace per il plugin Eyes: QA visivo di siti e app web direttamente da Claude Code.",
+  "owner": {
+    "name": "gerefloc45"
+  },
+  "plugins": [
+    {
+      "name": "eyes",
+      "source": "./",
+      "description": "Apre e analizza visivamente siti e app web: naviga, interagisce e segnala bug di layout, problemi di accessibilità ed errori console/rete."
+    }
+  ]
+}
