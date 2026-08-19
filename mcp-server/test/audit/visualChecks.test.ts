@@ -92,7 +92,21 @@ describe("collectVisualIssues (Playwright integration)", () => {
   it("correctly resolves inherited background for contrast calculation", async () => {
     await page.goto(`file://${join(fixturesDir, "contrast.html")}`);
     const issues = await collectVisualIssues(page);
-    const inheritedIssues = issues.filter((i) => i.selector.includes("inherited"));
-    expect(inheritedIssues).toHaveLength(0);
+    const inheritedId = await page.locator("#inherited").getAttribute("data-eyes-visual-id");
+    const expectedSelector = `[data-eyes-visual-id="${inheritedId}"]`;
+    const inheritedIssue = issues.find((i) => i.kind === "low-contrast" && i.selector === expectedSelector);
+    expect(inheritedIssue).toBeUndefined();
+  });
+
+  it("correctly parses fractional alpha in rgba backgrounds", async () => {
+    await page.goto(`file://${join(fixturesDir, "contrast.html")}`);
+    const issues = await collectVisualIssues(page);
+    const translucentId = await page.locator("#translucent").getAttribute("data-eyes-visual-id");
+    const expectedSelector = `[data-eyes-visual-id="${translucentId}"]`;
+    // With fractional alpha (0.5) correctly parsed, black text on white (from semi-transparent white layer) has high contrast
+    // Without the fix, alpha would be parsed as 0, causing the walk to skip past the translucent layer to the black parent,
+    // resulting in black-on-black being incorrectly flagged as low-contrast
+    const translucentIssue = issues.find((i) => i.kind === "low-contrast" && i.selector === expectedSelector);
+    expect(translucentIssue).toBeUndefined();
   });
 });

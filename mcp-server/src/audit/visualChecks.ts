@@ -52,9 +52,9 @@ export async function collectVisualIssues(page: Page): Promise<VisualIssue[]> {
       return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
     }
     function parseRgb(color: string): [number, number, number, number] {
-      const m = color.match(/\d+/g);
+      const m = color.match(/[\d.]+/g);
       if (!m) return [255, 255, 255, 1];
-      return [Number(m[0]), Number(m[1]), Number(m[2]), m[3] ? Number(m[3]) / 255 : 1];
+      return [Number(m[0]), Number(m[1]), Number(m[2]), m[3] ? Number(m[3]) : 1];
     }
     function getEffectiveBackgroundColor(el: Element): [number, number, number] {
       let current: Element | null = el;
