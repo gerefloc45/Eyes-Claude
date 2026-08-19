@@ -88,4 +88,11 @@ describe("collectVisualIssues (Playwright integration)", () => {
     const issues = await collectVisualIssues(page);
     expect(issues.some((i) => i.kind === "low-contrast")).toBe(true);
   });
+
+  it("correctly resolves inherited background for contrast calculation", async () => {
+    await page.goto(`file://${join(fixturesDir, "contrast.html")}`);
+    const issues = await collectVisualIssues(page);
+    const inheritedIssues = issues.filter((i) => i.selector.includes("inherited"));
+    expect(inheritedIssues).toHaveLength(0);
+  });
 });

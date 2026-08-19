@@ -51,10 +51,22 @@ export async function collectVisualIssues(page: Page): Promise<VisualIssue[]> {
       });
       return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
     }
-    function parseRgb(color: string): [number, number, number] {
+    function parseRgb(color: string): [number, number, number, number] {
       const m = color.match(/\d+/g);
-      if (!m) return [255, 255, 255];
-      return [Number(m[0]), Number(m[1]), Number(m[2])];
+      if (!m) return [255, 255, 255, 1];
+      return [Number(m[0]), Number(m[1]), Number(m[2]), m[3] ? Number(m[3]) / 255 : 1];
+    }
+    function getEffectiveBackgroundColor(el: Element): [number, number, number] {
+      let current: Element | null = el;
+      while (current) {
+        const style = getComputedStyle(current);
+        const [r, g, b, a] = parseRgb(style.backgroundColor);
+        if (a > 0) {
+          return [r, g, b];
+        }
+        current = current.parentElement;
+      }
+      return [255, 255, 255];
     }
 
     const elements = Array.from(document.querySelectorAll("body *")).slice(0, 300);
@@ -63,7 +75,7 @@ export async function collectVisualIssues(page: Page): Promise<VisualIssue[]> {
       const style = getComputedStyle(el);
       const rect = el.getBoundingClientRect();
       const [r1, g1, b1] = parseRgb(style.color);
-      const [r2, g2, b2] = parseRgb(style.backgroundColor);
+      const [r2, g2, b2] = getEffectiveBackgroundColor(el);
       const l1 = luminance(r1, g1, b1);
       const l2 = luminance(r2, g2, b2);
       const contrastRatio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
