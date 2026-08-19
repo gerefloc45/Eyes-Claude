@@ -2,10 +2,21 @@
 
 # Eyes
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Node.js 18+](https://img.shields.io/badge/node-18%2B-brightgreen.svg)
+
 **Give Claude eyes.** Eyes is a Claude Code plugin that lets Claude open a
 site or web app, navigate and interact with it like a real user, and
 report back the bugs it finds — broken layout, accessibility issues,
 console and network errors — instead of you having to check manually.
+
+## Requirements
+
+- [Node.js 18+](https://nodejs.org/) already installed and on your
+  `PATH` — the plugin runs its MCP server with your system's `node`, it
+  doesn't install one for you.
+- Chromium installed via Playwright — see the one-time browser setup
+  step under [Installation](#installation).
 
 ## Installation
 
@@ -98,12 +109,6 @@ Example report output:
 - 🟡 [Minor] Footer text truncated on mobile viewport (375px)
 ```
 
-## Requirements
-
-- Node.js 18+
-- Chromium installed via Playwright — see the one-time browser setup
-  step under [Installation](#installation).
-
 ## Known limitations
 
 - Default budget: at most 8 pages and 15 interactions per run, to keep
@@ -115,6 +120,21 @@ Example report output:
   the `url` parameter to point at an app you've started manually.
 - Full design details and rationale live in
   [`docs/superpowers/specs/2026-08-19-eyes-plugin-design.md`](docs/superpowers/specs/2026-08-19-eyes-plugin-design.md).
+
+## Troubleshooting
+
+- **"Executable doesn't exist" / browser launch error** — Chromium hasn't
+  been downloaded yet. Run `npx --yes playwright install chromium` once
+  and retry.
+- **"Could not detect how to start the project"** — Eyes couldn't
+  recognize the project's stack. Pass a running URL directly instead:
+  `/eyes http://localhost:3000`.
+- **Docker Compose project won't start** — not auto-started yet (see
+  [Known limitations](#known-limitations)); start it yourself and point
+  Eyes at the resulting URL.
+- **Tools don't show up in Claude Code** — make sure you fully restarted
+  Claude Code after installing, so the plugin's MCP server has a chance
+  to connect.
 
 ## Development
 
