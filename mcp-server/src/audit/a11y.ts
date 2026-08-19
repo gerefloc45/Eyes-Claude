@@ -1,5 +1,6 @@
 import type { Page } from "playwright";
-import AxeBuilder from "@axe-core/playwright";
+import { AxeBuilder } from "@axe-core/playwright";
+import type { Result } from "axe-core";
 
 export interface A11yIssue {
   id: string;
@@ -10,7 +11,7 @@ export interface A11yIssue {
 
 export async function runA11yAudit(page: Page): Promise<A11yIssue[]> {
   const results = await new AxeBuilder({ page }).analyze();
-  return results.violations.map((v) => ({
+  return results.violations.map((v: Result) => ({
     id: v.id,
     impact: v.impact ?? null,
     description: v.description,
