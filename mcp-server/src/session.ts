@@ -1,8 +1,9 @@
-import { chromium, type Browser, type Page } from "playwright";
+import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
 import { execSync, type ChildProcess } from "node:child_process";
 
 class EyesSession {
   private browser: Browser | null = null;
+  private context: BrowserContext | null = null;
   private page: Page | null = null;
   appProcess: ChildProcess | null = null;
   appCwd: string | null = null;
@@ -12,8 +13,14 @@ class EyesSession {
     if (!this.browser) {
       this.browser = await chromium.launch({ headless: true });
     }
+    if (!this.context) {
+      // Use an explicit context (rather than the browser.newPage() shortcut) because that
+      // shortcut creates a context with an "owner page" restriction that blocks tools like
+      // @axe-core/playwright from opening an auxiliary page in the same context.
+      this.context = await this.browser.newContext();
+    }
     if (!this.page) {
-      this.page = await this.browser.newPage();
+      this.page = await this.context.newPage();
     }
     return this.page;
   }
@@ -40,6 +47,10 @@ class EyesSession {
     if (this.page) {
       await this.page.close();
       this.page = null;
+    }
+    if (this.context) {
+      await this.context.close();
+      this.context = null;
     }
     if (this.browser) {
       await this.browser.close();
