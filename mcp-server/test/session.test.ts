@@ -26,4 +26,28 @@ describe("EyesSession", () => {
     const freshSession = getSession();
     expect(freshSession).not.toBe(session);
   });
+
+  it("teardown does not throw even if appProcess cleanup fails", async () => {
+    const session = getSession();
+    await session.getPage(); // Create the browser and page
+
+    // Set up a fake appProcess that throws when killed
+    session.appProcess = {
+      killed: false,
+      kill: () => {
+        throw new Error("Simulated kill() failure");
+      },
+    } as any;
+
+    // teardown() should not throw despite the kill() failure
+    await session.teardown(); // Should not throw
+
+    // Reset for next test
+    resetSessionForTests();
+
+    // A fresh session should work, proving no leaked browser handles
+    const freshSession = getSession();
+    const freshPage = await freshSession.getPage();
+    expect(freshPage).toBeDefined();
+  });
 });
