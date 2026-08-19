@@ -1,5 +1,15 @@
 .worktrees/
-node_modules/
-mcp-server/node_modules/
-mcp-server/dist/
+/node_modules/
 .superpowers/
+
+# mcp-server/node_modules is ignored except for playwright/playwright-core,
+# which are vendored (committed) because the plugin install pipeline never
+# runs npm install for the MCP server -- see mcp-server/dist/index.cjs below.
+mcp-server/node_modules/*
+!mcp-server/node_modules/playwright/
+!mcp-server/node_modules/playwright-core/
+
+# mcp-server/dist is the tsc dev build output (ignored) except for the
+# esbuild-produced, self-contained bundle that ships with the plugin.
+mcp-server/dist/*
+!mcp-server/dist/index.cjs
