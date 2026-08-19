@@ -32,6 +32,13 @@ export async function openPage(options: OpenPageOptions): Promise<OpenPageResult
   const consoleMessages: OpenPageResult["consoleMessages"] = [];
   const failedRequests: OpenPageResult["failedRequests"] = [];
 
+  // Remove listeners left by a previous openPage() call on this same session page
+  // (the session's Page is reused across calls) so they don't stack up and keep
+  // pushing into stale, already-returned arrays.
+  page.removeAllListeners("console");
+  page.removeAllListeners("requestfailed");
+  page.removeAllListeners("response");
+
   page.on("console", (msg) => {
     if (msg.type() === "error" || msg.type() === "warning") {
       consoleMessages.push({ type: msg.type(), text: msg.text() });

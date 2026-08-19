@@ -34,4 +34,14 @@ describe("openPage", () => {
     const count = await page.locator(button!.selector).count();
     expect(count).toBe(1);
   });
+
+  it("does not stack event listeners across repeated calls on the same session page", async () => {
+    await openPage({ url: fixtureUrl });
+    await openPage({ url: fixtureUrl });
+
+    const page = await getSession().getPage();
+    expect(page.listenerCount("console")).toBe(1);
+    expect(page.listenerCount("requestfailed")).toBe(1);
+    expect(page.listenerCount("response")).toBe(1);
+  });
 });
