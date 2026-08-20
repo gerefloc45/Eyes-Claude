@@ -2,7 +2,6 @@
 
 # Eyes
 
-[![test](https://github.com/gerefloc45/Eyes-Claude/actions/workflows/test.yml/badge.svg)](https://github.com/gerefloc45/Eyes-Claude/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Node.js 18+](https://img.shields.io/badge/node-18%2B-brightgreen.svg)
 
