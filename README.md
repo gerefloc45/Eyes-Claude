@@ -145,7 +145,7 @@ npx playwright install chromium
 npm test
 ```
 
-The test suite (64 tests) runs against a real headless Chromium browser
+The test suite (65 tests) runs against a real headless Chromium browser
 and real spawned processes — no mocks.
 
 ## License

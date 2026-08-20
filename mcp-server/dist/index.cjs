@@ -55948,7 +55948,7 @@ async function stopApp() {
 
 // src/index.ts
 function createServer() {
-  const server = new McpServer({ name: "eyes", version: "0.1.0" });
+  const server = new McpServer({ name: "eyes", version: "1.4.0" });
   server.tool(
     "start_app",
     "Starts a local app by auto-detecting its stack, or uses an already-running URL.",

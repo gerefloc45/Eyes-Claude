@@ -1,7 +1,7 @@
 {
   "name": "eyes",
   "description": "Opens and visually analyzes sites and web apps: navigates, interacts, and reports layout bugs, accessibility issues, and console/network errors.",
-  "version": "0.1.4",
+  "version": "1.4.0",
   "author": {
     "name": "gerefloc45"
   },

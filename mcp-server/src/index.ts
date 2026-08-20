@@ -7,7 +7,7 @@ import { clickElement, fillElement } from "./tools/interact.js";
 import { stopApp } from "./tools/stopApp.js";
 
 export function createServer(): McpServer {
-  const server = new McpServer({ name: "eyes", version: "0.1.0" });
+  const server = new McpServer({ name: "eyes", version: "1.4.0" });
 
   server.tool(
     "start_app",
