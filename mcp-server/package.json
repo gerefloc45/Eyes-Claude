@@ -1,6 +1,6 @@
 {
   "name": "eyes-mcp-server",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "description": "MCP server that gives Claude Code a browser to open, navigate and QA web apps for the Eyes plugin.",
   "license": "MIT",
   "type": "module",

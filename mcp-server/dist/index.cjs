@@ -55209,7 +55209,17 @@ var EyesSession = class {
   detectedStack = null;
   async getPage() {
     if (!this.browser) {
-      this.browser = await import_playwright.chromium.launch({ headless: true });
+      try {
+        this.browser = await import_playwright.chromium.launch({ headless: true });
+      } catch (error2) {
+        const message = error2 instanceof Error ? error2.message : String(error2);
+        if (message.includes("Executable doesn't exist")) {
+          throw new Error(
+            "Eyes: Chromium isn't installed yet. Run `npx --yes playwright install chromium` once, then try again."
+          );
+        }
+        throw error2;
+      }
     }
     if (!this.context) {
       this.context = await this.browser.newContext();

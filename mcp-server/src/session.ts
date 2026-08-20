@@ -11,7 +11,17 @@ class EyesSession {
 
   async getPage(): Promise<Page> {
     if (!this.browser) {
-      this.browser = await chromium.launch({ headless: true });
+      try {
+        this.browser = await chromium.launch({ headless: true });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (message.includes("Executable doesn't exist")) {
+          throw new Error(
+            "Eyes: Chromium isn't installed yet. Run `npx --yes playwright install chromium` once, then try again."
+          );
+        }
+        throw error;
+      }
     }
     if (!this.context) {
       // Use an explicit context (rather than the browser.newPage() shortcut) because that

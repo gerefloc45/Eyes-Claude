@@ -1,7 +1,8 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { spawn } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { chromium } from "playwright";
 import { getSession, resetSessionForTests } from "../src/session.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -17,6 +18,21 @@ describe("EyesSession", () => {
     const page1 = await session.getPage();
     const page2 = await session.getPage();
     expect(page1).toBe(page2);
+  });
+
+  it("getPage surfaces a clear install instruction when Chromium isn't downloaded", async () => {
+    const launchSpy = vi
+      .spyOn(chromium, "launch")
+      .mockRejectedValueOnce(
+        new Error("browserType.launch: Executable doesn't exist at /fake/path/chrome")
+      );
+
+    const session = getSession();
+    await expect(session.getPage()).rejects.toThrow(
+      "Eyes: Chromium isn't installed yet. Run `npx --yes playwright install chromium` once, then try again."
+    );
+
+    launchSpy.mockRestore();
   });
 
   it("returns the same session instance from getSession()", () => {
